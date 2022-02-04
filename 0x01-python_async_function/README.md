@@ -1,14 +1,10 @@
-###  ⚡0x01. Python - Async ⚡
+0x01. Python - Async
 
-### Author
+Learning Objectives
+At the end of this project, you are expected to be able to explain to anyone, without the help of Google:
 
-Sebastián Contreras / sebastiancontreras15897@gmail.com 📧
-
---------------------------------------------------------
-### Web developer 💻
-
-By learning related concepts, we explain step by step what asynchronous programming is.
-
-Asynchronous programming gives us the ability to "defer" the execution of a function while waiting for an operation to be completed, usually I / O (network, hard disk, ...), and thus avoid blocking the execution until it has been completed. completed the task in question.
-
-### 💻#end💻
+async and await syntax
+How to execute an async program with asyncio
+How to run concurrent coroutines
+How to create asyncio tasks
+How to use the random module

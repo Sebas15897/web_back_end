@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""Python and Async functions"""
+"""wait random module
+"""
 import asyncio
 import random
 
 
 async def wait_random(max_delay: int = 10) -> float:
-    """returns a delayed value"""
-    delayed_value = random.uniform(0, max_delay)
-    await asyncio.sleep(delayed_value)
-    return delayed_value
+    """wait random number
+    Args:
+        max_delay (int, optional): max number. Defaults to 10.
+    Returns:
+        float: random float number
+    """
+    random_delay: float = random.uniform(0, max_delay)
+    await asyncio.sleep(random_delay)
+    return random_delay
