@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""hypermedia pagination
+"""
+nyes
 """
 import csv
 import math
-from typing import List, Tuple, Dict, Union
+from typing import List, Dict
 
 
 class Server:
@@ -25,56 +26,53 @@ class Server:
 
         return self.__dataset
 
-    def index_range(self, page: int, page_size: int) -> Tuple[int, int]:
-        """return a tuple of size two containing a start index and an end index
-        Args:
-            page (int): number of page
-            page_size (int): size of page
-        Returns:
-            Tuple[int, int]: (start index, end index)
-        """
-        end: int = page * page_size
-        start: int = 0
-        for _ in range(page - 1):
-            start += page_size
-        return (start, end)
+    def index_range(self, page: int, page_size: int) -> tuple:
+        """a function that"""
+        return ((page * page_size - page_size), (page * page_size))
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """get page
-        Args:
-            page (int, optional): number of page. Defaults to 1.
-            page_size (int, optional): number of row in page. Defaults to 10.
-        Returns:
-            List[List]: List of dataset rows by range
         """
-        assert type(page) is int and type(page_size) is int
-        assert page > 0 and page_size > 0
-        dataset = self.dataset()
-        start, end = self.index_range(page, page_size)
-        if end > len(dataset):
+        Get page
+        """
+        assert type(page) == int
+        assert type(page_size) == int
+        assert page > 0
+        assert page_size > 0
+        indx = self.index_range(page, page_size)
+        start = indx[0]
+        end = indx[1]
+        x = start
+        result = []
+        csv_file = self.dataset()
+        if len(csv_file) < end:
             return []
-        return [list(dataset[row]) for row in range(start, end)]
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) ->\
-            Dict[str, Union[List[List], None, int]]:
-        """get hyper
-        Args:
-            page (int, optional): number of page. Defaults to 1.
-            page_size (int, optional): number of row in page. Defaults to 10.
-        Returns:
-            Dict[ int, int, List[List], Union[None, int], Union[None, int],
-            int]: HATEOAS
+        while start != end:
+            result.append(csv_file[start])
+            start += 1
+
+        return result
+
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, int]:
         """
-        data: List = self.get_page(page, page_size)
-        size_dataset: int = len(self.dataset())
-        total_pages = math.ceil(size_dataset / page_size)
-        prev_page = None if page - 1 == 0 else page - 1
-        next_page = None if page + 1 > size_dataset or data == [] else page + 1
-        page_size = 0 if data == [] else page_size
-        hateoas: Dict = {'page_size': page_size,
-                         'page': page,
-                         'data': data,
-                         'next_page': next_page,
-                         'prev_page': prev_page,
-                         'total_pages': total_pages}
-        return hateoas
+            Get hyper
+        """
+        total_pages = len(self.dataset()) / page_size
+        test = len(self.dataset()) % page_size
+        if test != 0:
+            total_pages += 1
+        data = self.get_page(page, page_size)
+        next_page = page + 1
+        if self.get_page(page + 1, page_size) == []:
+            next_page = None
+        prev_page = page - 1
+        if prev_page == 0:
+            prev_page = None
+        result = {
+                    'page_size': page_size,
+                    'page': page, 'data': data,
+                    'next_page': next_page,
+                    'prev_page': prev_page,
+                    'total_pages': int(total_pages)
+                }
+        return result

@@ -1,77 +1,95 @@
 #!/usr/bin/env python3
-""" Test SUITE Unittest module Task """
-
-from unittest import TestCase, mock
-from unittest.mock import patch, Mock
-from parameterized import parameterized
+"""
+unittest class to asure that
+Access nested map function
+works as expected
+"""
+import utils
 from utils import access_nested_map, get_json, memoize
+import unittest
+from unittest.mock import patch
+from parameterized import parameterized, parameterized_class
 
 
-class TestAccessNestedMap(TestCase):
-    """ Class for testing Nested Map function """
+class TestAccessNestedMap(unittest.TestCase):
+    """
+    the test access nested map
+    test cases class.
+    """
+
     @parameterized.expand([
-        ({"a": 1}, ("a",), 1),
-        ({"a": {"b": 2}}, ("a",), {'b': 2}),
-        ({"a": {"b": 2}}, ("a", "b"), 2)
+                        ({"a": 1}, ("a",), 1),
+                        ({"a": {"b": 2}}, ("a", ), {"b": 2}),
+                        ({"a": {"b": 2}}, ("a", "b"), 2)
+                        ])
+    def test_access_nested_map(self, nested_map, path, expected):
+        """
+        Assert the output is
+        equal to the expected result.
+        """
+        self.assertEqual(access_nested_map(nested_map, path), expected)
+
+    @parameterized.expand([
+       ({}, ('a', )),
+       ({'a': 1}, ('a', 'b'))
     ])
-    def test_access_nested_map(self, map, path, expected_output):
-        """ Test method return output """
-        real_output = access_nested_map(map, path)
-        self.assertEqual(real_output, expected_output)
+    def test_access_nested_map_exception(self, nested_map, path):
+        """
+        test if the nested map function
+        raises the KeyError when an
+        argument, expected result is missing.
+        also makes sure that the exception message
+        is as expected
+        """
+        self.assertRaises(KeyError,  access_nested_map, nested_map, path)
 
+
+class TestGetJson(unittest.TestCase):
+    """
+    test get json
+    """
     @parameterized.expand([
-        ({}, ("a",), 'a'),
-        ({"a": 1}, ("a", "b"), 'b')
-    ])
-    def test_access_nested_map_exception(self, map, path, wrong_output):
-        """ Test method raises correct exception """
-        with self.assertRaises(KeyError) as e:
-            access_nested_map(map, path)
-            self.assertEqual(wrong_output, e.exception)
-
-
-class TestGetJson(TestCase):
-    """ Class for testing get_json function """
-    # order of args: test_url, test_payload
-    @parameterized.expand([
-        ("http://example.com", {"payload": True}),
-        ("http://holberton.io", {"payload": False})
+        ("http://example.com", {"test_payload": True}),
+        ("http://holberton.io", {"test_payload": False})
     ])
     def test_get_json(self, test_url, test_payload):
-        """ Test method returns correct output """
-        # set mock response to have return value of test payload
-        mock_response = Mock()
-        mock_response.json.return_value = test_payload
-        # function calls requests.get, need patch to get mock return value
-        with patch('requests.get', return_value=mock_response):
-            real_response = get_json(test_url)
-            self.assertEqual(real_response, test_payload)
-            # check that mocked method called once per input
-            mock_response.json.assert_called_once()
+        """
+            patch the requests.get
+            to return a fake payload
+            assert that we're getting
+            the expected result
+        """
+        with patch('requests.get') as mc:
+            mc.return_value.json.return_value = test_payload
+            response = get_json(test_url)
+            self.assertEqual(response, test_payload)
+            mc.assert_called_once()
 
 
-class TestMemoize(TestCase):
-    """ Class for testing memoization """
-
+class TestMemoize(unittest.TestCase):
+    """
+    a class that tests the
+    test_memoize method
+    """
     def test_memoize(self):
-        """ Tests memoize function """
-
+        """
+        test memoize
+        """
         class TestClass:
-            """ Test class """
-
+            """
+            testclass"""
             def a_method(self):
-                """ Method to always return 42 """
+                """a_met"""
                 return 42
 
             @memoize
             def a_property(self):
-                """ Returns memoized property """
+                """
+                aprperty"""
                 return self.a_method()
 
-        with patch.object(TestClass, 'a_method', return_value=42) as patched:
-            test_class = TestClass()
-            real_return = test_class.a_property
-            real_return = test_class.a_property
-
-            self.assertEqual(real_return, 42)
-            patched.assert_called_once()
+        with patch.object(TestClass, 'a_method', return_value=42) as mc:
+            obj = TestClass()
+            self.assertEqual(obj.a_property, mc.return_value)
+            self.assertEqual(obj.a_property, mc.return_value)
+            mc.assert_called_once()

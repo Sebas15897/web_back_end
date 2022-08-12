@@ -1,17 +1,17 @@
+'use strict';
 const request = require('request');
-const { expect } = require('chai');
+const chai = require('chai');
 
-describe('Integration Testing', () => {
+describe('basic integration testing', () => {
   describe('GET /', () => {
-    it('Code: 200 | Body: Welcome to the payment system', (done) => {
-      const options = {
+    it('endpoint GET /', (done) => {
+      const call = {
         url: 'http://localhost:7865',
         method: 'GET',
       };
-
-      request(options, function (error, response, body) {
-        expect(response.statusCode).to.equal(200);
-        expect(body).to.equal('Welcome to the payment system');
+      request(call, (error, response, body) => {
+        chai.expect(response.statusCode).to.equal(200);
+        chai.expect(body).to.equal('Welcome to the payment system');
         done();
       });
     });

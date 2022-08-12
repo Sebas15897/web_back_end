@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Python and Async coroutines"""
+"""
+wait_n
+"""
 import asyncio
-from typing import List
+import typing
+
 
 wait_random = __import__('0-basic_async_syntax').wait_random
 
 
-async def wait_n(n: int, max_delay: int) -> List[float]:
-    """returns list of all delayed async tasks"""
-    tasks = [asyncio.create_task(wait_random(max_delay)) for _ in range(n)]
-    delayed_tasks = [await task for task in asyncio.as_completed(tasks)]
-    return delayed_tasks
+async def wait_n(n: int, max_delay: int) -> typing.List[float]:
+    """
+    a7dohom lam yanem, ala khater realpython documention
+    """
+    x = await asyncio.gather(*[wait_random(max_delay) for y in range(n)])
+    return sorted(x)

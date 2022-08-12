@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-""" 0-app module """
-from flask import Flask
-from routes.routes_0 import app_routes
-
-
+"""
+basic hello world example
+"""
+import flask
+from flask import Flask, render_template
+from flask_babel import Babel
 app = Flask(__name__)
+babel = Babel(app)
 
-app.register_blueprint(app_routes)
 
+class Config(object):
+    """
+    a configuration variable
+    """
+    LANGUAGES = ['en', 'fr']
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+@app.route("/", methods=['GET'])
+def hello_world():
+    """hello world"""
+    return render_template('0-index.html')

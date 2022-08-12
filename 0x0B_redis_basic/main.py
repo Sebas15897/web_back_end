@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""
-Main file
-"""
+""" Main file """
 import redis
 
-Cache = __import__('exercise').Cache
+get_page = __import__('web').get_page
 
-cache = Cache()
+store = redis.Redis()
 
-data = b"hello"
-key = cache.store(data)
-print(key)
+URL = "http://slowwly.robertomurray.co.uk"
+count_key = "count:" + URL
+print(store.get(count_key))
 
-local_redis = redis.Redis()
-print(local_redis.get(key))
+get_page(URL)
+get_page(URL)
+get_page(URL)
+get_page(URL)
+get_page(URL)
+print(store.get(count_key))

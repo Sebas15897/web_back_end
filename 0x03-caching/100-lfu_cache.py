@@ -1,59 +1,48 @@
 #!/usr/bin/python3
-"""LFUCache module
 """
+Least frequently used
+"""
+
 from base_caching import BaseCaching
 
 
-class LFUCache(BaseCaching):
-    """LFUCache class
-    Args:
-        BaseCaching (class): Basic class for this class
+class LRUCache(BaseCaching):
     """
+        placeholder
+    """
+    AGE = 0
+    AGE_BITS = {}
+
     def __init__(self):
-        """constructor"""
+
         super().__init__()
-        self.__keys = []
-        self.__counter = {}
 
     def put(self, key, item):
-        """put item into cache_data with LFU algorithm
-        Args:
-            key ([type]): key of dictionary
-            item ([type]): item to insert in dictionary
         """
-        if not key or not item:
+        placeholder
+        """
+        if key is None or item is None:
             return
-        if len(self.cache_data) == self.MAX_ITEMS and key not in self.__keys:
-            self.discard()
-        if key not in self.cache_data:
-            self.__counter[key] = 1
-        else:
-            self.__counter[key] += 1
-            self.__keys.remove(key)
-        self.__keys.append(key)
+        if (len(self.cache_data.items()) == BaseCaching.MAX_ITEMS):
+            if (key not in self.cache_data.keys()):
+                leastItem = {
+                    k: v for k, v in sorted(self.AGE_BITS.items(),
+                                            key=lambda item: item[1])
+                }
+                leastItem = list(leastItem)[0]
+                print("DISCARD:", leastItem)
+                self.cache_data.pop(leastItem)
+                self.AGE_BITS.pop(leastItem)
+
         self.cache_data[key] = item
+        self.AGE += 1
+        self.AGE_BITS[key] = self.AGE
 
     def get(self, key):
-        """get value of cache_data dictionary
-        Args:
-            key ([type]): key to search into cache_data
-        """
-        if not key or key not in self.cache_data:
+        """gets the required element by key"""
+        if key not in self.cache_data.keys():
             return None
-        self.__counter[key] += 1
-        self.__keys.remove(key)
-        self.__keys.append(key)
-        return self.cache_data[key]
-
-    def discard(self):
-        """discard item and print
-        """
-        m_time = min(self.__counter.values())
-        keys = [k for k, v in self.__counter.items() if v == m_time]
-        low = 0
-        while self.__keys[low] not in keys:
-            low += 1
-        discard = self.__keys.pop(low)
-        del self.cache_data[discard]
-        del self.__counter[discard]
-        print('DISCARD: {}'.format(discard))
+        else:
+            self.AGE += 1
+            self.AGE_BITS[key] = self.AGE
+            return self.cache_data[key]

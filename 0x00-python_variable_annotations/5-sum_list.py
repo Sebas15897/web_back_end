@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""sum_list module
+"""
+a type-annotated function sum_list which takes a
+list input_list of floats as argument
 """
 from typing import List
 
 
 def sum_list(input_list: List[float]) -> float:
-    """return sum of float list
-    Args:
-        input_list (List[float]): list of float numbers
-    Returns:
-        float: return sum of all float number in a list
     """
-    return float(sum(input_list))
+    returns their sum as a float.
+    """
+    return sum(input_list)

@@ -1,12 +1,18 @@
--- Average weighted score
-DELIMITER //
-CREATE PROCEDURE ComputeAverageWeightedScoreForUsers() BEGIN
-UPDATE users
-SET average_score = (
-    SELECT sum(p.weight * c.score) / sum(p.weight)
-    FROM projects AS p
-      INNER JOIN corrections AS c ON p.id = c.project_id
-    WHERE c.user_id = users.id
-  );
-END;
-DELIMITER; //
+
+-- Yess offccc
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers$$
+
+CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
+BEGIN
+    UPDATE users
+    SET average_score = (
+        SELECT SUM(proj.weight * corr.score) / SUM(proj.weight)
+        FROM corrections AS corr RIGHT JOIN projects AS proj
+        ON corr.project_id = proj.id WHERE corr.user_id = users.id
+    );
+END$$
+
+DELIMITER ;

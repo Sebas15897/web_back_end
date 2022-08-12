@@ -1,91 +1,119 @@
 #!/usr/bin/env python3
-""" Auth module
+"""
+    basic auth class
+    that inherits from auth
 """
 from api.v1.auth.auth import Auth
 import base64
 from typing import TypeVar
 from models.user import User
+import sys
 
 
 class BasicAuth(Auth):
     """
-    Basic Auth class
+        for now this class
+        litearlly does nothing
+        except inherits from auth
     """
+    def extract_base64_authorization_header(
+        self,
+        authorization_header: str
+            ) -> str:
+        """
+        Basic - Base64 part
+        """
+        if (
+            type(authorization_header) != str or
+            authorization_header is None or
+            authorization_header[0:6] != "Basic "
+        ):
+            return None
+        else:
+            return authorization_header[6:len(authorization_header)]
 
-    def extract_base64_authorization_header(self,
-                                            authorization_header: str) -> str:
+    def decode_base64_authorization_header(
+        self,
+        base64_authorization_header: str
+            ) -> str:
         """
-        extract_base64_authorization_header function
+            decode the value of a base64 string
+            that is made by the above function
         """
-        if authorization_header is None:
-            return None
-        if type(authorization_header) is not str:
-            return None
-        if authorization_header[0:6] != 'Basic ':
-            return None
-        return authorization_header[6:]
-
-    def decode_base64_authorization_header(self,
-                                           base64_authorization_header: str
-                                           ) -> str:
-        """
-        decode_base64_authorization_header function
-        """
-        if base64_authorization_header is None:
-            return None
-        if type(base64_authorization_header) is not str:
+        if (
+            type(base64_authorization_header) != str or
+            base64_authorization_header is None
+        ):
             return None
         try:
-            base64_bytes = base64_authorization_header.encode("utf-8")
-            sample_string_bytes = base64.b64decode(base64_bytes)
-            sample_string = sample_string_bytes.decode("utf-8")
-            return sample_string
+            return base64.b64decode(
+                base64_authorization_header
+                ).decode('utf-8')
         except Exception:
             return None
 
-    def extract_user_credentials(self,
-                                 decoded_base64_authorization_header: str
-                                 ) -> (str, str):
+    def extract_user_credentials(
+        self,
+        decoded_base64_authorization_header: str
+            ) -> (str, str):
         """
-        extract_user_credentials function
+        why the argument name is this long ?
         """
-        if decoded_base64_authorization_header is None:
-            return None, None
-        if type(decoded_base64_authorization_header) is not str:
-            return None, None
-        if decoded_base64_authorization_header.find(":") == -1:
-            return None, None
-        separator = decoded_base64_authorization_header.find(":")
-        user = decoded_base64_authorization_header[:separator]
-        pswd = decoded_base64_authorization_header[separator + 1:]
-        return user, pswd
+        if (
+            decoded_base64_authorization_header is None or
+            type(decoded_base64_authorization_header) is not str or
+            ":" not in decoded_base64_authorization_header
+                ):
+            return (None, None)
+        return (
+            decoded_base64_authorization_header.split(":", 1)[0],
+            decoded_base64_authorization_header.split(":", 1)[1]
+        )
 
-    def user_object_from_credentials(self, user_email: str, user_pwd: str
-                                     ) -> TypeVar('User'):
-        """
-        user_object_from_credentials function
-        """
-        if user_email is None or type(user_email) is not str:
+    def user_object_from_credentials(
+        self,
+        user_email: str,
+        user_pwd: str
+            ) -> TypeVar('User'):
+        """do funny stuff"""
+        if (
+            user_email is None or
+            user_pwd is None or
+            type(user_email) is not str or
+            type(user_pwd) is not str
+                ):
             return None
-        if user_pwd is None or type(user_pwd) is not str:
+        user = User()
+        search = user.search({"email": user_email, })
+        if not search:
             return None
-        try:
-            user = User.search({'email': user_email})
-        except Exception:
+        user = search[0]
+
+        if not user.is_valid_password(user_pwd):
             return None
-        if len(user) == 0:
-            return None
-        valid_pass = user[0].is_valid_password(user_pwd)
-        if not valid_pass:
-            return None
-        return user[0]
+
+        return user
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
-        current_user function
+            current user yes
         """
+        if not self.authorization_header(request):
+            return None
         header = self.authorization_header(request)
-        authorization = self.extract_base64_authorization_header(header)
-        _decode = self.decode_base64_authorization_header(authorization)
-        credential = self.extract_user_credentials(_decode)
-        return self.user_object_from_credentials(credential[0], credential[1])
+
+        header = self.extract_base64_authorization_header(header)
+        if header is None:
+            return None
+        dec_header = self.decode_base64_authorization_header(header)
+        if dec_header is None:
+            return None
+        creds = self.extract_user_credentials(dec_header)
+        if creds is None:
+            return None
+        email = self.extract_user_credentials(dec_header)[0]
+        pwd = self.extract_user_credentials(dec_header)[1]
+
+        if self.user_object_from_credentials(email, pwd) is None:
+            return None
+        return self.user_object_from_credentials(email, pwd)

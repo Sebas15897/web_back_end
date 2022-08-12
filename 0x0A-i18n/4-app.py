@@ -1,27 +1,42 @@
 #!/usr/bin/env python3
-""" 4-app module """
-from typing import Union
-from flask import Flask, request
+"""
+ Parametrize templates
+"""
+import flask
+from flask import Flask, render_template, g, request
 from flask_babel import Babel
-from config import Config
-from routes.routes_4 import app_routes
 
 
 app = Flask(__name__)
 babel = Babel(app)
 
-app.config.from_object(Config)
-app.register_blueprint(app_routes)
+
+class Config(object):
+    """
+    a configuration variable
+    """
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
 @babel.localeselector
-def get_locale() -> Union[str, None]:
-    """ get locale """
-    locale = request.args.get('locale')
-    if locale and locale in Config.LANGUAGES:
-        return locale
-    return request.accept_languages.best_match(Config.LANGUAGES)
+def get_locale():
+    """ if a user is logged in, use the locale from the user settings
+    """
+    if request.args.get('locale'):
+        if request.args.get('locale') in Config.LANGUAGES:
+            return request.args.get('locale')
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    return request.accept_languages.best_match(['en', 'fr'])
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+app.config.from_object(Config)
+
+
+@app.route("/", methods=['GET'])
+def hello_world():
+    """hello world"""
+    return render_template('3-index.html')

@@ -1,45 +1,48 @@
 #!/usr/bin/python3
-""" Task 3 >> LRU Caching
+"""
+placeholder
 """
 
 from base_caching import BaseCaching
 
 
 class LRUCache(BaseCaching):
-    """LIFO Cache Class"""
+    """
+        placeholder
+    """
+    AGE = 0
+    AGE_BITS = {}
 
     def __init__(self):
-        """Constructor Method"""
+
         super().__init__()
-        self.list_name = []
 
     def put(self, key, item):
-        """Put Method"""
+        """
+        placeholder
+        """
         if key is None or item is None:
             return
+        if (len(self.cache_data.items()) == BaseCaching.MAX_ITEMS):
+            if (key not in self.cache_data.keys()):
+                leastItem = {
+                    k: v for k, v in sorted(self.AGE_BITS.items(),
+                                            key=lambda item: item[1])
+                }
+                leastItem = list(leastItem)[0]
+                print("DISCARD:", leastItem)
+                self.cache_data.pop(leastItem)
+                self.AGE_BITS.pop(leastItem)
 
         self.cache_data[key] = item
-
-        if key not in self.list_name:
-            self.list_name.append(key)
-        else:
-            if self.list_name[-1] != key:
-                self.list_name.remove(key)
-                self.list_name.append(key)
-
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-            discard = self.list_name[0]
-            print('DISCARD: {}'.format(discard))
-            del self.cache_data[discard]
-            self.list_name.pop(0)
+        self.AGE += 1
+        self.AGE_BITS[key] = self.AGE
 
     def get(self, key):
-        """Get Method"""
-        if key is None or self.cache_data.get(key) is None:
+        """gets the required element by key"""
+        if key not in self.cache_data.keys():
             return None
-        if key in self.list_name:
-            if self.list_name[-1] != key:
-                self.list_name.remove(key)
-                self.list_name.append(key)
-
-        return self.cache_data[key]
+        else:
+            self.AGE += 1
+            self.AGE_BITS[key] = self.AGE
+            return self.cache_data[key]

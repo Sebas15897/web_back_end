@@ -1,35 +1,30 @@
 export default class Pricing {
   constructor(amount, currency) {
-    this._amount = amount;
-    this._currency = currency;
-  }
-
-  /* getter amount */
-  get amount() {
-    return this._amount;
-  }
-
-  /* setter amount */
-  set amount(value) {
-    this._amount = value;
-  }
-
-  /* getter currency */
-  get currency() {
-    return this._currency;
-  }
-
-  /* setter currency */
-  set currency(value) {
-    this._currency = value;
-  }
-
-  displayFullPrice() {
-    const currencyAll = this._currency.displayFullCurrency();
-    return `${this._amount} ${currencyAll}`;
+    if (typeof (currency) === 'object') { this._currency = currency; }
+    if (typeof (amount) === 'number') { this._amount = amount; }
   }
 
   static convertPrice(amount, conversionRate) {
     return amount * conversionRate;
+  }
+
+  set amount(amount) {
+    if (typeof (amount) === 'number') { this._amount = amount; }
+  }
+
+  get amount() {
+    return this._amount;
+  }
+
+  set currency(currency) {
+    if (typeof (currency) === 'object') { this._currency = currency; }
+  }
+
+  get currency() {
+    return this._currency;
+  }
+
+  displayFullPrice() {
+    return (`${this._amount} ${this.currency._name} (${this.currency._code})`);
   }
 }

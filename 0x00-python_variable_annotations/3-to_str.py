@@ -1,13 +1,12 @@
+
 #!/usr/bin/env python3
-"""to_str module
+"""
+ type-annotated function to_str that takes a float n as argument
 """
 
 
 def to_str(n: float) -> str:
-    """return representation in string of n number
-    Args:
-        n (float): number
-    Returns:
-        str: representation of n
+    """
+    returns the string representation of the float.
     """
     return str(n)

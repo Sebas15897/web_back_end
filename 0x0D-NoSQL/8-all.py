@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-""" Pymongo """
+"""
+doc doc pt 0
+"""
 
 
-def list_all(mongo_collection: object) -> list:
-    """List all documents in a collection
-
-    Args:
-        mongo_collection (object):
-        pymongo collection object
+def list_all(mongo_collection):
     """
-    return mongo_collection.find({}) if mongo_collection.find({}) else []
+    doc doc pt 0
+    """
+    result = mongo_collection.school.find()
+    if result:
+        return result
+    return []

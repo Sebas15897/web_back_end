@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Simple pagination
+"""
+nyes
 """
 import csv
 import math
-from typing import List, Tuple
+from typing import List
 
 
 class Server:
@@ -25,32 +26,30 @@ class Server:
 
         return self.__dataset
 
-    def index_range(self, page: int, page_size: int) -> Tuple[int, int]:
-        """return a tuple of size two containing a start index and an end index
-        Args:
-            page (int): number of page
-            page_size (int): size of page
-        Returns:
-            Tuple[int, int]: (start index, end index)
-        """
-        end: int = page * page_size
-        start: int = 0
-        for _ in range(page - 1):
-            start += page_size
-        return (start, end)
+    def index_range(self, page: int, page_size: int) -> tuple:
+        """a function that"""
+        return ((page * page_size - page_size), (page * page_size))
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """get page
-        Args:
-            page (int, optional): number of page. Defaults to 1.
-            page_size (int, optional): number of row in page. Defaults to 10.
-        Returns:
-            List[List]: List of dataset rows by range
         """
-        assert type(page) is int and type(page_size) is int
-        assert page > 0 and page_size > 0
-        dataset = self.dataset()
-        start, end = self.index_range(page, page_size)
-        if end > len(dataset):
+        Get page
+        """
+        assert type(page) == int
+        assert type(page_size) == int
+        assert page > 0
+        assert page_size > 0
+        indx = self.index_range(page, page_size)
+        start = indx[0]
+        end = indx[1]
+        x = start
+        result = []
+        csv_file = self.dataset()
+        if len(csv_file) < end:
+
             return []
-        return [list(dataset[row]) for row in range(start, end)]
+
+        while start != end:
+            result.append(csv_file[start])
+            start += 1
+
+        return result
